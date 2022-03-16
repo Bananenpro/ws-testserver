@@ -22,7 +22,7 @@ func Input(question string) string {
 }
 
 func PrintMessage(msg string) {
-	fmt.Println()
+	fmt.Print("\x1b[2K\r")
 	log.Info("Received:", msg)
 	if waitingForInput {
 		fmt.Print(inputQuestion)
