@@ -17,6 +17,7 @@ type client struct {
 	server             *Server
 	controlClientsLock sync.RWMutex
 	controlClients     []*controlClient
+	messages           [][]byte
 }
 
 type controlClient struct {
@@ -95,6 +96,10 @@ func (s *Server) attachControlClient(w http.ResponseWriter, r *http.Request) {
 	client.controlClients = append(client.controlClients, ctrl)
 	client.controlClientsLock.Unlock()
 
+	for _, m := range client.messages {
+		conn.WriteMessage(websocket.TextMessage, m)
+	}
+
 	go ctrl.handleConnection()
 
 	log.Tracef("Control client %s connected and attached itself to client %s.", client.conn.RemoteAddr(), client.id)
@@ -112,6 +117,8 @@ func (c *client) handleConnection() {
 		if msgType != websocket.TextMessage {
 			log.Warnf("Received unsupported message type from client %s. Only text messages are supported!", c.id)
 		}
+
+		c.messages = append(c.messages, msg)
 
 		c.controlClientsLock.RLock()
 		for _, ctrl := range c.controlClients {
