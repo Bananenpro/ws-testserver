@@ -2,7 +2,7 @@
 
 ## Description
 
-A simple websocket server, which enables you to view all incoming data and to send arbitrary text to clients.
+A simple websocket server, which enables you to manually send and receive any text.
 
 ## Setup
 
