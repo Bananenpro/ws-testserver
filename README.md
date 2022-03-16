@@ -17,10 +17,16 @@ git clone https://github.com/Bananenpro/ws-testserver.git
 cd ws-testserver
 ```
 
-Compile and run the application:
+Compile and run the server:
 
 ```sh
-go run ./cmd
+go run ./cmd/ws-server/main.go
+```
+
+Attach a control client:
+
+```sh
+go run ./cmd/ws-server-attach/main.go <client-id>
 ```
 
 ## License
