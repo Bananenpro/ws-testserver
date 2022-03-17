@@ -18,6 +18,9 @@ func Input(question string) string {
 	inputQuestion = question
 	scanner.Scan()
 	waitingForInput = false
+
+	fmt.Print("\x1b[1A\x1b[2K\r")
+
 	return scanner.Text()
 }
 
