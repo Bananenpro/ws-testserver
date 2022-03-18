@@ -60,20 +60,13 @@ func printCurrentInputPrompt() {
 }
 
 func inputMessage(fileExtension string) string {
-	editor := getDefaultEditorName()
 	tempFile, err := os.CreateTemp("", fmt.Sprintf("input.*.%s", fileExtension))
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to create temp file: %s", err))
 	}
 	tempFile.Close()
 
-	cmd := exec.Command(editor, tempFile.Name())
-
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err = cmd.Run()
+	editor, err := executeDefaultEditor(tempFile.Name())
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to run default editor '%s': %s", editor, err))
 	}
@@ -94,20 +87,41 @@ func inputMessage(fileExtension string) string {
 	return content
 }
 
-func getDefaultEditorName() string {
+// returns the used editor
+func executeDefaultEditor(path string) (string, error) {
+	var cmd *exec.Cmd
+	var editor string
+
 	if runtime.GOOS == "windows" {
+		editor = "notepad"
 		if _, err := exec.LookPath("code"); err == nil {
-			return "code"
+			editor = "code"
+		}
+		cmd = exec.Command("start", "/wait", editor, path)
+		if editor == "code" {
+			cmd = exec.Command("code", "--wait", path)
+		}
+	} else {
+		editor = "vi"
+		if _, err := exec.LookPath("vim"); err == nil {
+			editor = "vim"
 		}
 
-		return "notepad"
-	}
-	if editor := os.Getenv("VISUAL"); editor != "" {
-		return editor
-	}
-	if editor := os.Getenv("EDITOR"); editor != "" {
-		return editor
+		if e := os.Getenv("VISUAL"); e != "" {
+			editor = e
+		} else if e := os.Getenv("EDITOR"); e != "" {
+			editor = e
+		}
+
+		cmd = exec.Command(editor, path)
+		if editor == "code" {
+			cmd = exec.Command("code", "--wait", path)
+		}
 	}
 
-	return "vim"
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return editor, cmd.Run()
 }
