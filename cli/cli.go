@@ -79,8 +79,6 @@ func inputMessage(fileExtension string) string {
 	content := string(data)
 	content = strings.ReplaceAll(content, "\r", "")
 	content = strings.ReplaceAll(content, "\n", "")
-	content = strings.ReplaceAll(content, "\t", "")
-	content = strings.ReplaceAll(content, " ", "")
 
 	os.Remove(tempFile.Name())
 
