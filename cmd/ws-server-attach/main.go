@@ -32,9 +32,12 @@ func main() {
 	go client.Listen()
 
 	for {
-		err := client.Send(cli.Input("Enter a message: "))
-		if err != nil {
-			log.Error("Failed to send message to server:", err)
+		msg := cli.AskForMessage()
+		if msg != "" {
+			err := client.Send(msg)
+			if err != nil {
+				log.Error("Failed to send message to server:", err)
+			}
 		}
 	}
 }
