@@ -2,7 +2,7 @@
 
 ## Description
 
-A simple websocket server, which enables you to manually send and receive any text.
+An interactive websocket server for testing clients.
 
 ## Setup
 
