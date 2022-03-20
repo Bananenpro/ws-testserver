@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -31,7 +32,7 @@ func AskForMessage() string {
 
 	fmt.Print("\x1b[1A\x1b[2K\r")
 
-	ext := strings.TrimPrefix(strings.TrimSpace(scanner.Text()), ".")
+	ext := strings.ToLower(strings.TrimPrefix(strings.TrimSpace(scanner.Text()), "."))
 	if ext == "" {
 		ext = "txt"
 	}
@@ -74,6 +75,15 @@ func inputMessage(fileExtension string) string {
 	data, err := os.ReadFile(tempFile.Name())
 	if err != nil {
 		PrintError(fmt.Sprintf("Failed to read temp file: %s", err))
+	}
+
+	if fileExtension == "json" {
+		var jsonData json.RawMessage
+		json.Unmarshal(data, &jsonData)
+		encodedData, err := json.Marshal(jsonData)
+		if err == nil {
+			data = encodedData
+		}
 	}
 
 	content := string(data)
